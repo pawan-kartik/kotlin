@@ -47,6 +47,15 @@ class ObjCExportMapper(
             bridgeMethodImpl(descriptor)
         }
     }
+
+    fun getClassIfCategory(descriptor: CallableMemberDescriptor): ClassDescriptor? =
+        org.jetbrains.kotlin.backend.konan.objcexport.getClassIfCategory(descriptor)
+
+    fun isTopLevel(descriptor: CallableMemberDescriptor): Boolean =
+        org.jetbrains.kotlin.backend.konan.objcexport.isTopLevel(descriptor)
+
+    fun isSpecialMapped(descriptor: ClassDescriptor): Boolean =
+        org.jetbrains.kotlin.backend.konan.objcexport.isSpecialMapped(descriptor)
 }
 
 internal fun isSpecialMapped(descriptor: ClassDescriptor): Boolean {
