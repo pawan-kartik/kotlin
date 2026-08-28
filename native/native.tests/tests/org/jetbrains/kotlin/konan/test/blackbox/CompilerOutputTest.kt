@@ -402,6 +402,29 @@ abstract class CompilerOutputTestBase : AbstractNativeSimpleTest() {
         module4.files += TestFile.createCommitted(testClashingBindClassToObjCNameRootDir.resolve("main.kt"), module4)
         add(module4)
     })
+
+    @Test
+    fun testProduceObjCCacheArgumentValidation() {
+        Assumptions.assumeTrue(targets.hostTarget.family.isAppleFamily)
+        val testCase = generateTestCaseWithSingleFile(
+            testClashingBindClassToObjCNameRootDir.resolve("class.kt"),
+            freeCompilerArgs = TestCompilerArgs(listOf("-produce", "objc_cache")),
+            extras = TestCase.NoTestRunnerExtras(),
+            testKind = TestKind.STANDALONE_NO_TR,
+        )
+        val compilation = ExecutableCompilation(
+            testRunSettings,
+            freeCompilerArgs = testCase.freeCompilerArgs,
+            sourceModules = testCase.modules,
+            extras = testCase.extras,
+            dependencies = emptyList(),
+            expectedArtifact = TestCompilationArtifact.Executable(buildDir.resolve("objc_cache_validation_test")),
+        )
+        val compilationResult = compilation.result
+        assertIs<TestCompilationResult.Failure>(compilationResult)
+        val output = compilationResult.toOutput().sanitizeCompilationOutput()
+        assertContains(output, "-produce objc_cache requires -Xadd-cache to be specified")
+    }
 }
 
 @TestDataPath("\$PROJECT_ROOT")
